@@ -1,0 +1,8 @@
+node_modules/
+dist/
+data/
+*.exe
+*.log
+frp/*
+!frp/放这里.txt
+.DS_Store

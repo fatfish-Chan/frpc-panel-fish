@@ -1,0 +1,51 @@
+{
+  "name": "frpc-panel-fish",
+  "productName": "大肥鱼 frpc 面板",
+  "version": "1.2.0",
+  "description": "大肥鱼给 frpc 做的桌面小应用：卡片看规则，开关立刻重载",
+  "main": "main.js",
+  "author": "大肥鱼",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "start:min": "electron . --minimized",
+    "build": "electron-builder --win portable --x64",
+    "build:dir": "electron-builder --win --dir"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "moe.sazuyo.frpcpanel",
+    "productName": "大肥鱼 frpc 面板",
+    "files": [
+      "main.js",
+      "preload.js",
+      "server.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "frp",
+        "to": "frp"
+      }
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "renderer/img/icon-512.png",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "大肥鱼frpc面板.exe"
+    },
+    "electronLanguages": [
+      "zh-CN",
+      "en-US",
+      "zh-TW"
+    ],
+    "compression": "maximum",
+    "afterPack": "scripts/afterPack.js"
+  }
+}
