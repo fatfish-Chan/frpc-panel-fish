@@ -40,7 +40,7 @@ function createWindow() {
   const { screen } = require('electron');
   const area = screen.getPrimaryDisplay().workAreaSize;
   const w = Math.min(1180, Math.max(960, area.width - 80));
-  const h = Math.min(860, Math.max(640, area.height - 80));
+  const h = Math.min(700, Math.max(600, area.height - 380));
   win = new BrowserWindow({
     width: w,
     height: h,
