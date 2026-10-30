@@ -25,6 +25,13 @@ async function boot() {
       return;
     }
   }
+  // 客户端一启动就把 frpc 拉起来（已经在跑就跳过）
+  try {
+    const r = await backend.ensureFrpcRunning();
+    console.log('[frpc]', r.message);
+  } catch (e) {
+    console.log('[frpc] 自启失败:', e && e.message);
+  }
   createWindow();
   createTray();
 }

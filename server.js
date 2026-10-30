@@ -219,6 +219,25 @@ async function restartFrpc(s) {
   return up ? { ok: true, message: 'frpc 已重载' } : { ok: false, message: '配置写好了，但 frpc 没起来，看看日志' };
 }
 
+// 开机就把 frpc 拉起来：已经在跑就不动，没跑就按当前配置启一个
+async function ensureFrpcRunning() {
+  const s = getSettings();
+  if (!s.frpc_path || !fs.existsSync(s.frpc_path)) return { ok: false, message: '找不到 frpc 程序：' + s.frpc_path };
+  if (await frpcRunning()) return { ok: true, message: 'frpc 本来就在跑' };
+  if (!fs.existsSync(s.config_path)) return { ok: false, message: '还没有配置文件：' + s.config_path };
+  try {
+    const child = spawn(s.frpc_path, ['-c', s.config_path], {
+      cwd: path.dirname(s.frpc_path), detached: true, stdio: 'ignore', windowsHide: true,
+    });
+    child.unref();
+  } catch (e) {
+    return { ok: false, message: '启动失败：' + e.message };
+  }
+  await sleep(1200);
+  const up = await frpcRunning();
+  return { ok: up, message: up ? 'frpc 已自动启动' : 'frpc 没起来，看看日志' };
+}
+
 function backup(file) {
   try {
     if (!fs.existsSync(file)) return;
@@ -392,4 +411,4 @@ function start(port = 8899) {
   });
 }
 
-module.exports = { start, getSettings, getRules, parseConfig, renderConfig, frpcRunning, FRP_DIR, DATA };
+module.exports = { start, getSettings, getRules, parseConfig, renderConfig, frpcRunning, ensureFrpcRunning, FRP_DIR, DATA };

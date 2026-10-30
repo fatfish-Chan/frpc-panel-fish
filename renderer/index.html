@@ -49,7 +49,6 @@ body{
 .winbtn:hover{background:rgba(74,163,255,.16);color:#e6f1ff;transform:none;box-shadow:none}
 .winbtn.close:hover{background:#c8434f;color:#fff}
 body{padding-top:40px}
-body.allview .wrap{max-width:1560px}
 
 .wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:26px 18px 90px}
 
@@ -87,7 +86,6 @@ button.ghost{background:rgba(22,35,58,.55)}
 button.iconbtn{width:34px;height:34px;padding:0;display:grid;place-items:center;border-radius:10px}
 
 .grid{margin-bottom:26px}
-.grid.allview{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
 .grid.hscroll{display:flex;gap:16px;overflow-x:auto;overflow-y:hidden;padding:4px 2px 14px;
   scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:#2b4569 transparent}
 .grid.hscroll::-webkit-scrollbar{height:9px}
@@ -160,6 +158,10 @@ pre::-webkit-scrollbar-track{background:transparent}
 .foot{margin-top:24px;padding-top:14px;border-top:1px solid #1b2a44;color:#7d90b0;font-size:12px;
   display:flex;gap:10px 18px;flex-wrap:wrap;justify-content:space-between;line-height:1.7}
 .foot a{color:#6fb4ff;text-decoration:none;border-bottom:1px dashed rgba(111,180,255,.4)}
+.foot .gh{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;
+  border:1px solid #22344f;background:#111c2e;color:#9fb6d6;border-bottom:1px solid #22344f;
+  transition:transform .18s,color .18s,border-color .18s,background .18s}
+.foot .gh:hover{transform:translateY(-2px);color:#fff;border-color:#3d6a9e;background:#16243a}
 .foot a:hover{color:#a8d2ff}
 h2{font-size:15px;margin:26px 0 10px;color:#b9cdea;font-weight:600;display:flex;align-items:center;gap:8px}
 h2::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-gradient(#4aa3ff,#5fe3d1)}
@@ -196,7 +198,6 @@ h2::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-
       <button class="ghost" onclick="load()">刷新</button>
       <button class="ghost" onclick="importCfg()">读取现有配置</button>
       <button class="ghost" onclick="openSettings()">⚙ 设置</button>
-      <button class="ghost" id="viewBtn" onclick="toggleView()">⛶ 全览</button>
       <button class="primary" onclick="openModal()">＋ 增加规则</button>
     </div>
   </header>
@@ -207,7 +208,9 @@ h2::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-
   <pre id="preview"></pre>
 
   <footer class="foot">
-    <span>源码：<a href="https://github.com/fatfish-Chan/frpc-panel-fish" target="_blank" rel="noreferrer">github.com/fatfish-Chan/frpc-panel-fish</a></span>
+    <a class="gh" href="https://github.com/fatfish-Chan/frpc-panel-fish" target="_blank" rel="noreferrer" title="源码：github.com/fatfish-Chan/frpc-panel-fish" aria-label="GitHub 源码">
+      <svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+    </a>
     <span>形象素材：社区二创（大肥鱼 · DeepSeek 蓝鲸拟人），版权归原作者，此处仅非商业使用</span>
   </footer>
 </div>
@@ -364,17 +367,6 @@ async function saveRule(){
 if(!window.fishWin){ const b=document.getElementById('winbtns'); if(b) b.style.display='none'; }
 function winMin(){ window.fishWin && window.fishWin.min(); }
 function winClose(){ window.fishWin && window.fishWin.hide(); }
-
-// ---- 全览 / 横滑 ----
-let ALLVIEW = false;
-function toggleView(){
-  ALLVIEW = !ALLVIEW;
-  const g = document.getElementById('grid');
-  g.classList.toggle('allview', ALLVIEW);
-  document.body.classList.toggle('allview', ALLVIEW);
-  g.classList.toggle('hscroll', !ALLVIEW);
-  document.getElementById('viewBtn').textContent = ALLVIEW ? '↔ 横滑' : '⛶ 全览';
-}
 
 function openSettings(){
   const s = STATE.settings || {};
