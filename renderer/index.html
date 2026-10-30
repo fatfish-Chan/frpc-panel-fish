@@ -85,13 +85,29 @@ button.primary{background:linear-gradient(135deg,#4aa3ff,#5fe3d1);border:none;co
 button.ghost{background:rgba(22,35,58,.55)}
 button.iconbtn{width:34px;height:34px;padding:0;display:grid;place-items:center;border-radius:10px}
 
-.grid{margin-bottom:26px}
-.grid.hscroll{display:flex;gap:16px;overflow-x:auto;overflow-y:hidden;padding:4px 2px 14px;
-  scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:#2b4569 transparent}
-.grid.hscroll::-webkit-scrollbar{height:9px}
-.grid.hscroll::-webkit-scrollbar-thumb{background:#2b4569;border-radius:9px}
-.grid.hscroll .tile{flex:0 0 300px;scroll-snap-align:start}
-.grid.hscroll .empty{flex:0 0 100%}
+.grid{margin-bottom:26px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;
+  transition:opacity .16s ease,transform .16s ease}
+.grid.out{opacity:0;transform:translateX(-16px)}
+.grid.in{animation:groupIn .3s cubic-bezier(.2,.9,.25,1)}
+@keyframes groupIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.grid .empty{grid-column:1 / -1}
+.pager{display:flex;align-items:center;gap:6px;color:var(--dim);font-size:12px;margin-left:2px}
+
+/* 全部规则弹窗里的列表 */
+.rlist{display:flex;flex-direction:column;gap:8px;max-height:58vh;overflow:auto;padding-right:2px}
+.rrow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:13px;
+  background:rgba(13,23,40,.9);border:1px solid var(--line);transition:border-color .2s,transform .2s}
+.rrow:hover{border-color:rgba(74,163,255,.5);transform:translateX(2px)}
+.rrow .nm{flex:0 0 auto;min-width:110px;max-width:170px;font-weight:600;display:flex;align-items:center;gap:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rrow .ad{flex:1;min-width:0;font-size:12.5px;color:#cfe0ff;font-variant-numeric:tabular-nums;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rrow .ad b{color:var(--cyan);font-weight:700;margin:0 5px}
+.rrow .st{flex:0 0 auto;font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid}
+.rrow .st.on{color:var(--green);border-color:#1f6b52;background:#0f2a22}
+.rrow .st.off{color:#8fa0bb;border-color:#2a3854;background:#131f33}
+.rrow.off{opacity:.66}
+.modal .empty-list{color:var(--dim);font-size:13px;padding:24px 0;text-align:center}
 .tile{
   position:relative;border-radius:20px;padding:16px 16px 14px;
   display:flex;flex-direction:column;
@@ -198,11 +214,18 @@ h2::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-
       <button class="ghost" onclick="load()">刷新</button>
       <button class="ghost" onclick="importCfg()">读取现有配置</button>
       <button class="ghost" onclick="openSettings()">⚙ 设置</button>
+      <button class="iconbtn" id="nextBtn" title="下一组（每 3 条一组）" aria-label="下一组" onclick="nextGroup()">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+      </button>
+      <button class="iconbtn" id="expandBtn" title="展开全部规则" aria-label="展开全部规则" onclick="openAll()">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <span class="pager" id="pager"></span>
       <button class="primary" onclick="openModal()">＋ 增加规则</button>
     </div>
   </header>
 
-  <div class="grid hscroll" id="grid"></div>
+  <div class="grid" id="grid"></div>
 
   <h2>即将写入的配置</h2>
   <pre id="preview"></pre>
@@ -230,6 +253,17 @@ h2::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-
     <div class="actions">
       <button class="ghost" onclick="closeModal()">取消</button>
       <button class="primary" onclick="saveRule()">保存并生效</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="amask" onclick="if(event.target===this)closeAll()">
+  <div class="modal">
+    <h3>全部规则</h3>
+    <div class="hint" id="allHint">点一行可以跳到那条去改</div>
+    <div class="rlist" id="rlist"></div>
+    <div class="actions">
+      <button class="ghost" onclick="closeAll()">关上</button>
     </div>
   </div>
 </div>
@@ -276,6 +310,11 @@ async function api(path, opts={}){
   return j;
 }
 
+const PER = 3;
+let PAGE = 0;
+
+function pageCount(){ return Math.max(1, Math.ceil(STATE.rules.length / PER)); }
+
 function render(){
   const st = document.getElementById('status');
   if(STATE.frpc_running === true){ st.className='pill on'; st.textContent='frpc 运行中'; }
@@ -283,13 +322,23 @@ function render(){
   else { st.className='pill mid'; st.textContent='状态未知'; }
 
   const grid = document.getElementById('grid');
+  const pages = pageCount();
+  if(PAGE > pages - 1) PAGE = pages - 1;
+  if(PAGE < 0) PAGE = 0;
+  const pager = document.getElementById('pager');
+  if(pager) pager.textContent = STATE.rules.length ? `${PAGE + 1}/${pages}` : '';
+  const nextBtn = document.getElementById('nextBtn');
+  if(nextBtn) nextBtn.style.display = pages > 1 ? '' : 'none';
+
   if(!STATE.rules.length){
     grid.innerHTML = `<div class="empty"><b>还没有规则</b><br>点右上「＋ 增加规则」加一条，大肥鱼马上帮主人开隧道</div>`;
   } else {
-    grid.innerHTML = STATE.rules.map((r,i)=>{
+    const from = PAGE * PER;
+    grid.innerHTML = STATE.rules.slice(from, from + PER).map((r, k)=>{
+      const i = from + k;
       const host = STATE.settings.server_addr || '服务器';
       return `
-      <div class="tile ${r.enabled?'':'off'}" style="animation-delay:${Math.min(i*45,300)}ms">
+      <div class="tile ${r.enabled?'':'off'}" style="animation-delay:${Math.min(k*60,180)}ms">
         <div class="top">
           <div class="name"><span class="dot"></span>${esc(r.name)}</div>
           <span class="tag">${esc(r.type||'tcp')}</span>
@@ -311,6 +360,44 @@ function render(){
     }).join('');
   }
   document.getElementById('preview').textContent = STATE.preview || '';
+}
+
+// 下一组：淡出 → 换页 → 滑入
+let SWITCHING = false;
+function nextGroup(){
+  if(SWITCHING) return;
+  const pages = pageCount();
+  if(pages <= 1) return;
+  SWITCHING = true;
+  const grid = document.getElementById('grid');
+  grid.classList.add('out');
+  setTimeout(()=>{
+    PAGE = (PAGE + 1) % pages;
+    render();
+    grid.classList.remove('out');
+    grid.classList.add('in');
+    setTimeout(()=>{ grid.classList.remove('in'); SWITCHING = false; }, 320);
+  }, 165);
+}
+
+function openAll(){
+  const box = document.getElementById('rlist');
+  const host = (STATE.settings && STATE.settings.server_addr) || '服务器';
+  document.getElementById('allHint').textContent = STATE.rules.length
+    ? `共 ${STATE.rules.length} 条，点一行跳过去改`
+    : '还没有规则';
+  box.innerHTML = STATE.rules.length ? STATE.rules.map((r, i)=>`
+    <div class="rrow ${r.enabled?'':'off'}" onclick="jumpTo(${i})">
+      <div class="nm"><span class="dot"></span>${esc(r.name)}</div>
+      <div class="ad">${esc(r.local_ip||'127.0.0.1')}:${r.local_port}<b>→</b>${esc(host)}:${r.remote_port}</div>
+      <span class="st ${r.enabled?'on':'off'}">${r.enabled?'开':'关'}</span>
+    </div>`).join('') : '<div class="empty-list">还没有规则</div>';
+  document.getElementById('amask').classList.add('show');
+}
+function closeAll(){ document.getElementById('amask').classList.remove('show'); }
+function jumpTo(i){
+  closeAll();
+  setTimeout(()=>openModal(i), 180);
 }
 
 function openModal(i){
