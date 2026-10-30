@@ -1,9 +1,5 @@
 # 大肥鱼 frpc 面板
 
-给 [frp](https://github.com/fatedier/frp) 客户端做的 Windows 桌面面板：一条隧道一张卡片，开关一拨就自动重写配置并重启 frpc，不用再手抠 toml。
-
-单文件绿色版，双击就能用，不装运行时、不弹浏览器。后端是 Node 标准库写的，没有第三方依赖。
-
 ![主界面](docs/shot-main.png)
 
 ![全部规则](docs/shot-all.png)
