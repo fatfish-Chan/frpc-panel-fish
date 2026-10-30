@@ -1,7 +1,7 @@
 {
   "name": "frpc-panel-fish",
   "productName": "大肥鱼 frpc 面板",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "大肥鱼给 frpc 做的桌面小应用：卡片看规则，开关立刻重载",
   "main": "main.js",
   "author": "大肥鱼",

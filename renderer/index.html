@@ -50,7 +50,7 @@ body{
 .winbtn.close:hover{background:#c8434f;color:#fff}
 body{padding-top:40px}
 
-.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:26px 18px 90px}
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:26px 18px 74px}
 
 header{display:flex;gap:16px;align-items:center;justify-content:space-between;
   flex-wrap:wrap;margin-bottom:22px}
@@ -85,13 +85,19 @@ button.primary{background:linear-gradient(135deg,#4aa3ff,#5fe3d1);border:none;co
 button.ghost{background:rgba(22,35,58,.55)}
 button.iconbtn{width:34px;height:34px;padding:0;display:grid;place-items:center;border-radius:10px}
 
-.grid{margin-bottom:26px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;
+.rulewrap{display:flex;gap:14px;align-items:center;margin-bottom:26px}
+.grid{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;
   transition:opacity .16s ease,transform .16s ease}
+.rside{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.rside .iconbtn{width:40px;height:42px;border-radius:12px;display:grid;place-items:center;
+  background:rgba(22,35,58,.85);border:1px solid #22344f;color:#9fb6d6}
+.rside .iconbtn:hover{color:#fff;border-color:var(--blue);transform:translateY(-2px)}
+.rside .iconbtn:disabled{opacity:.3;cursor:default;transform:none}
 .grid.out{opacity:0;transform:translateX(-16px)}
 .grid.in{animation:groupIn .3s cubic-bezier(.2,.9,.25,1)}
 @keyframes groupIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
 .grid .empty{grid-column:1 / -1}
-.pager{display:flex;align-items:center;gap:6px;color:var(--dim);font-size:12px;margin-left:2px}
+.pager{color:var(--dim);font-size:11.5px;letter-spacing:.5px;font-variant-numeric:tabular-nums}
 
 /* 全部规则弹窗里的列表 */
 .rlist{display:flex;flex-direction:column;gap:8px;max-height:58vh;overflow:auto;padding-right:2px}
@@ -134,6 +140,8 @@ button.iconbtn{width:34px;height:34px;padding:0;display:grid;place-items:center;
 .tile:hover .chip{border-color:#2c4a75;color:#e4f0ff}
 .arrow{color:var(--cyan);font-weight:700}
 .comment{color:var(--dim);font-size:12.5px;min-height:18px}
+.tile{min-height:190px}
+.tile > *{flex:0 0 auto}
 .tile .foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px;gap:8px}
 
 .switch{position:relative;width:48px;height:27px;border-radius:999px;background:#243350;
@@ -143,6 +151,10 @@ button.iconbtn{width:34px;height:34px;padding:0;display:grid;place-items:center;
 .switch.on{background:linear-gradient(90deg,#14624a,#178a63);border-color:#1f7a5c;
   box-shadow:0 0 18px -4px rgba(55,211,155,.75)}
 .switch.on i{left:23px;background:var(--green);box-shadow:0 0 10px rgba(55,211,155,.9)}
+.switch.sm{width:38px;height:22px}
+.switch.sm i{width:16px;height:16px;top:2px;left:2px}
+.switch.sm.on i{left:18px}
+.rrow .iconbtn.sm{width:30px;height:30px;padding:0;font-size:13px;border-radius:9px}
 
 .empty{grid-column:1/-1;text-align:center;padding:44px 16px;border:1px dashed var(--line);
   border-radius:20px;color:var(--dim);animation:tileIn .5s both}
@@ -166,13 +178,16 @@ input,select{width:100%;background:#0b1424;border:1px solid var(--line);border-r
 input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,163,255,.16)}
 
 pre{background:#080f1b;border:1px solid #182740;border-radius:16px;padding:14px;overflow:auto;
-  font-size:12.5px;color:#9fbbdf;max-height:260px;scrollbar-width:thin;
+  font-size:12.5px;color:#9fbbdf;max-height:168px;scrollbar-width:thin;
   scrollbar-color:#2b4569 transparent}
 pre::-webkit-scrollbar{width:9px}
 pre::-webkit-scrollbar-thumb{background:#2b4569;border-radius:9px}
 pre::-webkit-scrollbar-track{background:transparent}
-.foot{margin-top:24px;padding-top:14px;border-top:1px solid #1b2a44;color:#7d90b0;font-size:12px;
-  display:flex;gap:10px 18px;flex-wrap:wrap;justify-content:space-between;line-height:1.7}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:6;margin:0;padding:10px 20px;
+  border-top:1px solid #1b2a44;color:#7d90b0;font-size:12px;
+  display:flex;gap:10px 18px;flex-wrap:wrap;justify-content:space-between;align-items:center;line-height:1.7;
+  background:linear-gradient(180deg,rgba(7,13,24,.55),rgba(7,13,24,.97) 45%);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .foot a{color:#6fb4ff;text-decoration:none;border-bottom:1px dashed rgba(111,180,255,.4)}
 .foot .gh{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;
   border:1px solid #22344f;background:#111c2e;color:#9fb6d6;border-bottom:1px solid #22344f;
@@ -214,18 +229,22 @@ h2::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-
       <button class="ghost" onclick="load()">刷新</button>
       <button class="ghost" onclick="importCfg()">读取现有配置</button>
       <button class="ghost" onclick="openSettings()">⚙ 设置</button>
-      <button class="iconbtn" id="nextBtn" title="下一组（每 3 条一组）" aria-label="下一组" onclick="nextGroup()">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
-      </button>
-      <button class="iconbtn" id="expandBtn" title="展开全部规则" aria-label="展开全部规则" onclick="openAll()">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <span class="pager" id="pager"></span>
       <button class="primary" onclick="openModal()">＋ 增加规则</button>
     </div>
   </header>
 
-  <div class="grid" id="grid"></div>
+  <div class="rulewrap">
+    <div class="grid" id="grid"></div>
+    <div class="rside">
+      <button class="iconbtn" id="nextBtn" title="下一组（每 3 条一组）" aria-label="下一组" onclick="nextGroup()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+      </button>
+      <button class="iconbtn" id="expandBtn" title="展开全部规则" aria-label="展开全部规则" onclick="openAll()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <span class="pager" id="pager"></span>
+    </div>
+  </div>
 
   <h2>即将写入的配置</h2>
   <pre id="preview"></pre>
@@ -260,10 +279,10 @@ h2::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-
 <div class="mask" id="amask" onclick="if(event.target===this)closeAll()">
   <div class="modal">
     <h3>全部规则</h3>
-    <div class="hint" id="allHint">点一行可以跳到那条去改</div>
+    <div class="hint" id="allHint">开关直接切，铅笔进编辑</div>
     <div class="rlist" id="rlist"></div>
     <div class="actions">
-      <button class="ghost" onclick="closeAll()">关上</button>
+      <button class="ghost" onclick="closeAll()">关闭</button>
     </div>
   </div>
 </div>
@@ -328,7 +347,7 @@ function render(){
   const pager = document.getElementById('pager');
   if(pager) pager.textContent = STATE.rules.length ? `${PAGE + 1}/${pages}` : '';
   const nextBtn = document.getElementById('nextBtn');
-  if(nextBtn) nextBtn.style.display = pages > 1 ? '' : 'none';
+  if(nextBtn) nextBtn.disabled = pages <= 1;
 
   if(!STATE.rules.length){
     grid.innerHTML = `<div class="empty"><b>还没有规则</b><br>点右上「＋ 增加规则」加一条，大肥鱼马上帮主人开隧道</div>`;
@@ -384,17 +403,29 @@ function openAll(){
   const box = document.getElementById('rlist');
   const host = (STATE.settings && STATE.settings.server_addr) || '服务器';
   document.getElementById('allHint').textContent = STATE.rules.length
-    ? `共 ${STATE.rules.length} 条，点一行跳过去改`
+    ? `共 ${STATE.rules.length} 条，开关直接切，铅笔进编辑`
     : '还没有规则';
   box.innerHTML = STATE.rules.length ? STATE.rules.map((r, i)=>`
-    <div class="rrow ${r.enabled?'':'off'}" onclick="jumpTo(${i})">
+    <div class="rrow ${r.enabled?'':'off'}">
       <div class="nm"><span class="dot"></span>${esc(r.name)}</div>
       <div class="ad">${esc(r.local_ip||'127.0.0.1')}:${r.local_port}<b>→</b>${esc(host)}:${r.remote_port}</div>
-      <span class="st ${r.enabled?'on':'off'}">${r.enabled?'开':'关'}</span>
+      <div class="switch sm ${r.enabled?'on':''}" title="${r.enabled?'关掉这条':'打开这条'}" onclick="toggleRow(${i},this)"><i></i></div>
+      <button class="iconbtn sm" title="编辑这条" onclick="jumpTo(${i})">✎</button>
     </div>`).join('') : '<div class="empty-list">还没有规则</div>';
   document.getElementById('amask').classList.add('show');
 }
 function closeAll(){ document.getElementById('amask').classList.remove('show'); }
+
+async function toggleRow(i, el){
+  const name = encodeURIComponent(STATE.rules[i].name);
+  el.classList.toggle('on');
+  try{
+    const j = await api('/api/rules/'+name+'/toggle', {method:'POST'});
+    toast(j.reloaded ? '已重载 frpc' : ('切换了，但 frpc 没起来：'+(j.message||'')), j.reloaded?'ok':'err');
+    await refresh();
+    if(document.getElementById('amask').classList.contains('show')) openAll();
+  }catch(e){ toast('失败：'+e.message,'err'); await refresh(); openAll(); }
+}
 function jumpTo(i){
   closeAll();
   setTimeout(()=>openModal(i), 180);
