@@ -6,3 +6,5 @@ data/
 frp/*
 !frp/放这里.txt
 .DS_Store
+
+*.bak
