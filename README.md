@@ -16,20 +16,16 @@
 - **自动备份**：每次写配置前把老文件存成 `frpc.toml.bak_时间戳`。
 - **托盘常驻**：关窗口只是收进托盘，隧道不断；托盘里能显示面板、打开 frp 目录、退出。
 
-## 快速开始
-
-### 用现成的 exe
-
-1. 下载 `大肥鱼frpc面板.exe`，随便放个文件夹，比如 `D:\frp-panel\`。
-2. 在同目录建 `frp\`，把 `frpc.exe` 和你的 `frpc.toml`（老版本是 `frpc.ini`）放进去。
-3. 双击 exe。面板起来的同时 frpc 也跟着跑，卡片会显示现有规则。
-
-### 从源码跑
+## 跑起来
 
 ```bash
+git clone https://github.com/fatfish-Chan/frpc-panel-fish.git
+cd frpc-panel-fish
 npm install
 npm start          # 只留托盘启动：npm run start:min
 ```
+
+出 exe 看下面的「打包成 exe」，仓库不发 Releases，自己构建一份就行。
 
 国内装 Electron 慢就挂镜像：
 
@@ -40,7 +36,7 @@ npm install
 
 ## 第一次使用要注意
 
-- `frpc.exe` 和配置文件要放在**同一个 `frp` 文件夹**里，路径可以不一样，在「⚙ 设置」里手填也行。
+- `frpc.exe` 和配置文件要放在**同一个 `frp` 文件夹**里（源码跑就放项目根的 `frp/`），路径不一样也能在「⚙ 设置」里手填。
 - 配置文件没有的话，面板会根据现有规则自己生成一份。
 - 服务端地址、端口、token 在「⚙ 设置」里填，保存后自动写进配置。
 
@@ -111,12 +107,14 @@ data/          规则与设置，自动生成
 - 端口被占时不再另起，直接连上已经在跑的那个实例。
 - 规则和设置存在 `data/`，配置写到你指定的 `frpc.toml` / `frpc.ini`。
 
-## 自己打包
+## 打包成 exe
 
 ```bash
-npm run build       # 出单文件 exe，产物在 dist/
+npm run build       # 出单文件 exe，产物在 dist/大肥鱼frpc面板.exe
 npm run build:dir   # 只要解包目录，调试快
 ```
+
+打出来的 exe 是绿色单文件，放到任意文件夹，旁边建个 `frp\` 塞进 `frpc.exe` 和配置就能双击跑。
 
 在 Linux 上交叉打包 Windows exe 需要关掉签名改写（`build.win.signAndEditExecutable: false`，仓库里已经配好），否则会因为没有 wine 报错。
 
@@ -129,7 +127,7 @@ npm run build:dir   # 只要解包目录，调试快
 面板只管客户端配置，服务端 `frps` 得在服务器上跑着，token 和端口要对得上。frpc 起不来时面板右下会弹提示，日志看设置的日志路径。
 
 **为什么会弹 Windows 安全提示？**
-单文件 exe 没有买签名证书，SmartScreen 对新程序会拦一下，点「更多信息 → 仍要运行」即可。源码全在仓库里，可以自己 `npm run build`。
+自己打包的单文件 exe 没有签名证书，SmartScreen 对新程序会拦一下，点「更多信息 → 仍要运行」即可。
 
 **能管多少条规则？**
 没有硬上限，多到 4 条以上就开始分页，每页 3 条。
